@@ -1,0 +1,29 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\ghayt\\OneDrive\\Desktop\\New folder\\GsC.API\\wwwroot\\google-auth-test.html",
+      "PackagePath": "staticwebassets\\google-auth-test.html"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.GsC.API.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.GsC.API.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.GsC.API.props",
+      "PackagePath": "build\\GsC.API.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.GsC.API.props",
+      "PackagePath": "buildMultiTargeting\\GsC.API.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.GsC.API.props",
+      "PackagePath": "buildTransitive\\GsC.API.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

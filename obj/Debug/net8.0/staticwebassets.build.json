@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "oG8DOK5aJaoHfr5GhR4Y/Qs3dp1ed3bpEhwGed8Pwc0=",
+  "Source": "GsC.API",
+  "BasePath": "_content/GsC.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

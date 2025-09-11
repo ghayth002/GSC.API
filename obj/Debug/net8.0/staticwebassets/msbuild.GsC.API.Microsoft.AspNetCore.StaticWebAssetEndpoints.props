@@ -1,0 +1,16 @@
+﻿<Project>
+  <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/GsC.API/google-auth-test.html">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\google-auth-test.html'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-MrKqx/mSxWNysS7IOGSFIfGlw6JlECqby7JhXFy5Jik="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"4631"},{"Name":"Content-Type","Value":"text/html"},{"Name":"ETag","Value":"\u0022MrKqx/mSxWNysS7IOGSFIfGlw6JlECqby7JhXFy5Jik=\u0022"},{"Name":"Last-Modified","Value":"Wed, 20 Aug 2025 12:49:11 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/GsC.API/google-auth-test.yg1z8yvg4s.html">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\google-auth-test.html'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"yg1z8yvg4s"},{"Name":"integrity","Value":"sha256-MrKqx/mSxWNysS7IOGSFIfGlw6JlECqby7JhXFy5Jik="},{"Name":"label","Value":"_content/GsC.API/google-auth-test.html"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"4631"},{"Name":"Content-Type","Value":"text/html"},{"Name":"ETag","Value":"\u0022MrKqx/mSxWNysS7IOGSFIfGlw6JlECqby7JhXFy5Jik=\u0022"},{"Name":"Last-Modified","Value":"Wed, 20 Aug 2025 12:49:11 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+  </ItemGroup>
+</Project>

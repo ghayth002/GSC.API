@@ -1,0 +1,6 @@
+@GsC.API_HostAddress = http://localhost:5114
+
+GET {{GsC.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
