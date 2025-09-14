@@ -98,6 +98,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IGscBusinessService, GscBusinessService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
 
 // Add Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();
@@ -198,7 +199,7 @@ app.Run();
 async Task SeedInitialData(UserManager<User> userManager, RoleManager<Role> roleManager, ApplicationDbContext context)
 {
     // Create default roles
-    string[] roles = ["Administrator", "Manager", "User", "Viewer"];
+    string[] roles = ["Administrator", "Manager", "User", "Viewer", "Fournisseur"];
     
     foreach (var roleName in roles)
     {
@@ -235,6 +236,9 @@ async Task SeedInitialData(UserManager<User> userManager, RoleManager<Role> role
         }
     }
 
+    // Créer un fournisseur par défaut
+    await CreateDefaultFournisseur(userManager, roleManager, context);
+
     // Create default permissions
     if (!context.Permissions.Any())
     {
@@ -265,6 +269,61 @@ async Task SeedInitialData(UserManager<User> userManager, RoleManager<Role> role
                 context.RolePermissions.Add(rolePermission);
             }
             await context.SaveChangesAsync();
+        }
+    }
+}
+
+async Task CreateDefaultFournisseur(UserManager<User> userManager, RoleManager<Role> roleManager, ApplicationDbContext context)
+{
+    var fournisseurEmail = "demo.fournisseur@gsc.com";
+    var fournisseurPassword = "Fournisseur123!";
+    
+    var existingFournisseurUser = await userManager.FindByEmailAsync(fournisseurEmail);
+    
+    if (existingFournisseurUser == null)
+    {
+        // Créer l'utilisateur fournisseur
+        var fournisseurUser = new User
+        {
+            UserName = fournisseurEmail,
+            Email = fournisseurEmail,
+            FirstName = "Demo",
+            LastName = "Fournisseur",
+            EmailConfirmed = true,
+            IsActive = true
+        };
+
+        var result = await userManager.CreateAsync(fournisseurUser, fournisseurPassword);
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(fournisseurUser, "Fournisseur");
+
+            // Créer le profil fournisseur
+            var fournisseur = new Fournisseur
+            {
+                UserId = fournisseurUser.Id,
+                CompanyName = "Demo Catering Solutions",
+                Address = "123 Avenue de la Restauration, 75001 Paris, France",
+                Phone = "+33 1 23 45 67 89",
+                ContactEmail = fournisseurEmail,
+                ContactPerson = "Demo Fournisseur",
+                Siret = "12345678901234",
+                NumeroTVA = "FR12345678901",
+                Specialites = "Restauration aérienne, menus gastronomiques, plateaux repas",
+                IsActive = true,
+                IsVerified = true, // Pré-vérifié pour les tests
+                CreatedAt = DateTime.UtcNow
+            };
+
+            context.Fournisseurs.Add(fournisseur);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine("🎉 FOURNISSEUR PAR DÉFAUT CRÉÉ !");
+            Console.WriteLine($"📧 Email: {fournisseurEmail}");
+            Console.WriteLine($"🔐 Mot de passe: {fournisseurPassword}");
+            Console.WriteLine($"🏢 Entreprise: {fournisseur.CompanyName}");
+            Console.WriteLine($"📍 Adresse: {fournisseur.Address}");
+            Console.WriteLine("✅ Statut: Actif et Vérifié");
         }
     }
 }

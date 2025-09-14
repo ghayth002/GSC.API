@@ -39,6 +39,8 @@ namespace GsC.API.Models
         [StringLength(100)]
         public string? Supplier { get; set; }
 
+        public int? FournisseurId { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -46,10 +48,12 @@ namespace GsC.API.Models
         public DateTime? UpdatedAt { get; set; }
 
         // Navigation properties
+        public virtual Fournisseur? Fournisseur { get; set; }
         public virtual ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
         public virtual ICollection<BonCommandePrevisionnelLigne> BonCommandePrevisionnelLignes { get; set; } = new List<BonCommandePrevisionnelLigne>();
         public virtual ICollection<BonLivraisonLigne> BonLivraisonLignes { get; set; } = new List<BonLivraisonLigne>();
         public virtual ICollection<PlanHebergementArticle> PlanHebergementArticles { get; set; } = new List<PlanHebergementArticle>();
         public virtual ICollection<Ecart> Ecarts { get; set; } = new List<Ecart>();
+        public virtual ICollection<DemandePlat> DemandePlats { get; set; } = new List<DemandePlat>();
     }
 }

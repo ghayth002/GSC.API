@@ -35,6 +35,12 @@ namespace GsC.API.Data
         public DbSet<DossierVolDocument> DossierVolDocuments { get; set; }
         public DbSet<RapportBudgetaire> RapportsBudgetaires { get; set; }
         public DbSet<RapportBudgetaireDetail> RapportBudgetaireDetails { get; set; }
+        
+        // Nouveaux modèles pour le système de demandes
+        public DbSet<Fournisseur> Fournisseurs { get; set; }
+        public DbSet<DemandeMenu> DemandesMenu { get; set; }
+        public DbSet<DemandePlat> DemandePlats { get; set; }
+        public DbSet<DemandeMenuReponse> DemandeMenuReponses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -337,6 +343,108 @@ namespace GsC.API.Data
                     .WithMany(r => r.Details)
                     .HasForeignKey(e => e.RapportBudgetaireId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configuration des nouvelles entités
+            ConfigureDemandeEntities(builder);
+        }
+
+        private void ConfigureDemandeEntities(ModelBuilder builder)
+        {
+            // Configuration Fournisseur
+            builder.Entity<Fournisseur>(entity =>
+            {
+                entity.Property(e => e.CompanyName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Address).HasMaxLength(200);
+                entity.Property(e => e.Phone).HasMaxLength(20);
+                entity.Property(e => e.ContactEmail).HasMaxLength(100);
+                entity.Property(e => e.ContactPerson).HasMaxLength(100);
+                entity.Property(e => e.Siret).HasMaxLength(50);
+                entity.Property(e => e.NumeroTVA).HasMaxLength(50);
+                entity.Property(e => e.Specialites).HasMaxLength(500);
+                entity.HasIndex(e => e.UserId).IsUnique();
+
+                entity.HasOne(e => e.User)
+                    .WithOne()
+                    .HasForeignKey<Fournisseur>(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configuration DemandeMenu
+            builder.Entity<DemandeMenu>(entity =>
+            {
+                entity.Property(e => e.Numero).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Titre).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Description).HasMaxLength(1000);
+                entity.Property(e => e.CommentairesAdmin).HasMaxLength(500);
+                entity.Property(e => e.CommentairesFournisseur).HasMaxLength(500);
+                entity.HasIndex(e => e.Numero).IsUnique();
+
+                entity.HasOne(e => e.DemandeParUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.DemandeParUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.AssigneAFournisseur)
+                    .WithMany()
+                    .HasForeignKey(e => e.AssigneAFournisseurId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configuration DemandePlat
+            builder.Entity<DemandePlat>(entity =>
+            {
+                entity.Property(e => e.NomPlatSouhaite).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.DescriptionSouhaitee).HasMaxLength(500);
+                entity.Property(e => e.UniteSouhaitee).HasMaxLength(50);
+                entity.Property(e => e.SpecificationsSpeciales).HasMaxLength(200);
+                entity.Property(e => e.CommentairesFournisseur).HasMaxLength(500);
+
+                entity.HasOne(e => e.DemandeMenu)
+                    .WithMany(d => d.DemandePlats)
+                    .HasForeignKey(e => e.DemandeMenuId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.ArticleProposed)
+                    .WithMany(a => a.DemandePlats)
+                    .HasForeignKey(e => e.ArticleProposedId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configuration DemandeMenuReponse
+            builder.Entity<DemandeMenuReponse>(entity =>
+            {
+                entity.Property(e => e.NomMenuPropose).HasMaxLength(200);
+                entity.Property(e => e.DescriptionMenuPropose).HasMaxLength(1000);
+                entity.Property(e => e.CommentairesFournisseur).HasMaxLength(500);
+                entity.Property(e => e.CommentairesAcceptation).HasMaxLength(500);
+
+                entity.HasOne(e => e.DemandeMenu)
+                    .WithMany(d => d.Reponses)
+                    .HasForeignKey(e => e.DemandeMenuId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.MenuProposed)
+                    .WithMany(m => m.DemandeMenuReponses)
+                    .HasForeignKey(e => e.MenuProposedId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Mise à jour des relations Article et Menu avec Fournisseur
+            builder.Entity<Article>(entity =>
+            {
+                entity.HasOne(e => e.Fournisseur)
+                    .WithMany(f => f.Articles)
+                    .HasForeignKey(e => e.FournisseurId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            builder.Entity<Menu>(entity =>
+            {
+                entity.HasOne(e => e.Fournisseur)
+                    .WithMany(f => f.Menus)
+                    .HasForeignKey(e => e.FournisseurId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

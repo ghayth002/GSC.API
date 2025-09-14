@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using GsC.API.Data;
 using GsC.API.Models;
 using GsC.API.DTOs;
+using GsC.API.Services;
+using System.Security.Claims;
 
 namespace GsC.API.Controllers
 {
@@ -11,10 +14,12 @@ namespace GsC.API.Controllers
     public class BonsCommandePrevisionnelsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMenuService _menuService;
 
-        public BonsCommandePrevisionnelsController(ApplicationDbContext context)
+        public BonsCommandePrevisionnelsController(ApplicationDbContext context, IMenuService menuService)
         {
             _context = context;
+            _menuService = menuService;
         }
 
         /// <summary>
@@ -484,6 +489,74 @@ namespace GsC.API.Controllers
                 .ToListAsync();
 
             return Ok(bons);
+        }
+
+        /// <summary>
+        /// Génère automatiquement un BCP basé sur les menus assignés à un vol (Admin uniquement)
+        /// </summary>
+        [HttpPost("generate-from-menus/{volId}")]
+        [Authorize(Roles = "Administrator,Manager")]
+        public async Task<ActionResult<BonCommandePrevisionnelDto>> GenerateBcpFromMenus(int volId)
+        {
+            try
+            {
+                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                
+                // Vérifier si le vol existe
+                var vol = await _context.Vols.FindAsync(volId);
+                if (vol == null)
+                {
+                    return NotFound($"Vol avec l'ID {volId} non trouvé.");
+                }
+
+                // Vérifier s'il y a déjà un BCP pour ce vol
+                var existingBcp = await _context.BonsCommandePrevisionnels
+                    .FirstOrDefaultAsync(bcp => bcp.VolId == volId);
+
+                if (existingBcp != null)
+                {
+                    return BadRequest($"Un BCP existe déjà pour ce vol (Numéro: {existingBcp.Numero}). Supprimez-le d'abord si vous voulez en générer un nouveau.");
+                }
+
+                // Générer le BCP depuis les menus
+                var bcpDto = await _menuService.GenerateBcpFromMenusAsync(volId, currentUserId);
+
+                return CreatedAtAction(nameof(GetBonCommandePrevisionnel), new { id = bcpDto.Id }, bcpDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur lors de la génération du BCP: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Récupère les statistiques des menus pour un vol (Admin uniquement)
+        /// </summary>
+        [HttpGet("menu-statistics/{volId}")]
+        [Authorize(Roles = "Administrator,Manager,User")]
+        public async Task<ActionResult<MenuStatisticsDto>> GetMenuStatistics(int volId)
+        {
+            try
+            {
+                var statistics = await _menuService.GetMenuStatisticsAsync(volId);
+                return Ok(statistics);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur lors du calcul des statistiques: {ex.Message}");
+            }
         }
 
         private bool BonCommandePrevisionnelExists(int id)
